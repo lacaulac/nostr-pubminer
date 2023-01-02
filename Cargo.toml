@@ -8,6 +8,8 @@ edition = "2021"
 [dependencies]
 rand = "0.8.5"
 secp256k1 = { version = "0.25.0", features = ["rand"] }
+bech32 = "0.9.1"
+hex = "0.4.3"
 
 [profile.release]
 lto = "fat"

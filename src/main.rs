@@ -1,4 +1,5 @@
 use std::{env, sync::mpsc::channel, sync::mpsc::Sender, fs::File, fs::OpenOptions, io::Write, thread::sleep, time::Duration};
+use bech32::{ToBase32, Variant};
 use secp256k1::{KeyPair, XOnlyPublicKey};
 
 fn run_thread(sender: Sender<KeyPair>) {
@@ -15,13 +16,17 @@ fn filter_pubkeys(pubkey: String, filter: &str) -> bool {
 }
 
 fn main() {
-    if env::args().len() != 3 {
-        println!("Usage: {} <filter> <threadAmount>", env::args().nth(0).unwrap());
+    if env::args().len() < 3 {
+        println!("Usage: {} <filter> <threadAmount> <optional:bech32->yes>", env::args().nth(0).unwrap());
         println!("\t Benchmark with \"benchmark\" as filter and threadAmount as the amount of iterations");
         return;
     }
     let filter_string = env::args().nth(1).unwrap();
     let thread_amount = env::args().nth(2).unwrap().parse::<u32>().unwrap();
+    let mut bech32 = false;
+    if env::args().len() == 4 {
+        bech32 = env::args().nth(3).unwrap() == "yes";
+    }
 
     if filter_string == "benchmark" {
         run_benchmark(thread_amount as u128);
@@ -62,9 +67,26 @@ fn main() {
         match new_result {
             Ok(result) => {
                 let (pubkey_readable, _) = XOnlyPublicKey::from_keypair(&result);
-                if !filter_pubkeys(pubkey_readable.to_string(), filter_string.as_str()) {
-                    continue;
+                if !bech32 {
+                    if !filter_pubkeys(pubkey_readable.to_string(), filter_string.as_str()) {
+                        continue;
+                    }
                 }
+                else {
+                    //Convert to bech32
+                    //println!("Key: {}", pubkey_readable.to_string());
+                    let bech_key: String = bech32::encode( //Shamefully stolen from https://github.com/grunch/rana/blob/main/src/main.rs in order to add bech32 support
+                        "npub",
+                        hex::decode(pubkey_readable.to_string()).unwrap().to_base32(),
+                        Variant::Bech32,
+                    ).unwrap();
+                    //println!("\tKey: {}", bech_key);
+                    let new_filter_string = format!("npub1{}", filter_string);
+                    if !filter_pubkeys(bech_key, new_filter_string.as_str()) {
+                        continue;
+                    }
+                }
+                
                 let tmp_output = format!("{};{}\n", result.display_secret(), pubkey_readable);
                 result_amount += 1;
                 println!("{} calculated keys...", result_amount);

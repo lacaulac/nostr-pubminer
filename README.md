@@ -1,6 +1,6 @@
 # Nostr CPU pubkey miner
 
-A simple tool to mine nostr vanity pubkeys. Currently only supports hexadecimal vanity keys.
+A simple tool to mine nostr vanity pubkeys. Currently supports hexadecimal and bech32 vanity keys.
 Tested on Windows but should run on other platforms supported by the rust compiler without any problems.
 This is quick and dirty code, but works well enough.
 
@@ -19,13 +19,19 @@ The executable will be in the newly created `target/release` directory.
 
 Every generated keypair will be stored in a `output.csv` file in the directory the tool is launched from.
 
-Generating vanity keypairs with the pubkey beginning with `deadbeef` using 11 threads :
+Generating vanity keypairs with the hex pubkey beginning with `deadbeef` using 11 threads :
 
 ```
-./vanitypubkey deadbeef 12
+./vanitypubkey deadbeef 11
 ```
 
-Running a one-core benchmark with 10000 iterations : 
+Generating vanity keypairs with the bech32 pubkey beginning with `npub1deadbeef` using 11 threads :
+
+```
+./vanitypubkey deadbeef 11 yes
+```
+
+Running a one-core benchmark with 10000 iterations (only hex filtering is tested atm): 
 
 ```
 ./vanitypubkey benchmark 10000
