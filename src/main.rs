@@ -109,7 +109,7 @@ fn run_benchmark(amount_of_tries: u128) {
                         
                     }
                     else {
-                        let tmp_output = format!("{};{}\n", result.display_secret(), pubkey_readable);
+                        let _tmp_output = format!("{};{}\n", result.display_secret(), pubkey_readable);
                     }
                 },
                 Err(_) => {
