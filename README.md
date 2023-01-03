@@ -31,10 +31,16 @@ Generating vanity keypairs with the bech32 pubkey beginning with `npub1dead8eef`
 ./vanitypubkey dead8eef 11 yes
 ```
 
-Running a one-core benchmark with 10000 iterations (only hex filtering is tested atm): 
+Running a one-core benchmark with 10000 iterations, testing generation and hex key filtering: 
 
 ```
 ./vanitypubkey benchmark 10000
+```
+
+Running a one-core benchmark with 10000 iterations, testing generation and bech32 key filtering: 
+
+```
+./vanitypubkey benchmark 10000 yes
 ```
 
 ## Architecture
