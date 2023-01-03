@@ -29,7 +29,7 @@ fn main() {
     }
 
     if filter_string == "benchmark" {
-        run_benchmark(thread_amount as u128);
+        run_benchmark(thread_amount as u128, bech32);
         return;
     }
 
@@ -74,13 +74,11 @@ fn main() {
                 }
                 else {
                     //Convert to bech32
-                    //println!("Key: {}", pubkey_readable.to_string());
                     let bech_key: String = bech32::encode( //Shamefully stolen from https://github.com/grunch/rana/blob/main/src/main.rs in order to add bech32 support
                         "npub",
                         hex::decode(pubkey_readable.to_string()).unwrap().to_base32(),
                         Variant::Bech32,
                     ).unwrap();
-                    //println!("\tKey: {}", bech_key);
                     let new_filter_string = format!("npub1{}", filter_string);
                     if !filter_pubkeys(bech_key, new_filter_string.as_str()) {
                         continue;
@@ -100,7 +98,7 @@ fn main() {
     }
 }
 
-fn run_benchmark(amount_of_tries: u128) {
+fn run_benchmark(amount_of_tries: u128, bech32: bool) {
     let (sender, receiver) = channel();
         use std::time::Instant;
         let filter_string = String::from("impossible");
@@ -127,12 +125,26 @@ fn run_benchmark(amount_of_tries: u128) {
             match new_result {
                 Ok(result) => {
                     let (pubkey_readable, _) = XOnlyPublicKey::from_keypair(&result);
-                    if !filter_pubkeys(pubkey_readable.to_string(), filter_string.as_str()) {
-                        
+                    if !bech32 {
+                        if !filter_pubkeys(pubkey_readable.to_string(), filter_string.as_str()) {
+                            total_filtering_time += start.elapsed().as_micros();
+                            continue;
+                        }
                     }
                     else {
-                        let _tmp_output = format!("{};{}\n", result.display_secret(), pubkey_readable);
+                        //Convert to bech32
+                        let bech_key: String = bech32::encode( //Shamefully stolen from https://github.com/grunch/rana/blob/main/src/main.rs in order to add bech32 support
+                            "npub",
+                            hex::decode(pubkey_readable.to_string()).unwrap().to_base32(),
+                            Variant::Bech32,
+                        ).unwrap();
+                        let new_filter_string = format!("npub1{}", filter_string);
+                        if !filter_pubkeys(bech_key, new_filter_string.as_str()) {
+                            total_filtering_time += start.elapsed().as_micros();
+                            continue;
+                        }
                     }
+                    let _tmp_output = format!("{};{}\n", result.display_secret(), pubkey_readable);
                 },
                 Err(_) => {
                     sleep(Duration::from_secs(1));
