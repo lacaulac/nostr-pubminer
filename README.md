@@ -25,10 +25,10 @@ Generating vanity keypairs with the hex pubkey beginning with `deadbeef` using 1
 ./vanitypubkey deadbeef 11
 ```
 
-Generating vanity keypairs with the bech32 pubkey beginning with `npub1deadbeef` using 11 threads :
+Generating vanity keypairs with the bech32 pubkey beginning with `npub1dead8eef` using 11 threads :
 
 ```
-./vanitypubkey deadbeef 11 yes
+./vanitypubkey dead8eef 11 yes
 ```
 
 Running a one-core benchmark with 10000 iterations (only hex filtering is tested atm): 
