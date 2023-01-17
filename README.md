@@ -9,7 +9,7 @@ This is quick and dirty code, but works well enough.
 After [installing rust](https://rustup.rs/), clone the repo and compile the tool :
 ```
 git clone https://github.com/lacaulac/nostr-pubminer.git
-cd nostr-cpu-pubkey-miner
+cd nostr-pubminer
 cargo build --release
 ```
 
